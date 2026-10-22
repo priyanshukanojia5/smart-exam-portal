@@ -4,6 +4,7 @@
   "description": "A polished, responsive browser-based practice examination system. No build tools or package installation required.",
   "main": "app.js",
   "scripts": {
+    "build": "node build.js",
     "start": "node server.js",
     "dev": "node --watch server.js",
     "db:view": "node view-db.js",
