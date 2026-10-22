@@ -694,14 +694,24 @@
     $("#themeToggle").textContent = "☾";
   }
 
+  function hideLoader() {
+    const el = $("#loader");
+    if (el) el.classList.add("done");
+  }
+
   // Initialization lifecycle
   async function init() {
+    setTimeout(hideLoader, 500);
     renderUser();
-    await checkBackendStatus();
-    await syncSession();
-    await syncAttempts();
-    window.addEventListener("load", () => setTimeout(() => $("#loader").classList.add("done"), 350));
-    setTimeout(() => $("#loader").classList.add("done"), 1200);
+    try {
+      await checkBackendStatus();
+      await syncSession();
+      await syncAttempts();
+    } catch (e) {
+      console.warn("Backend sync error:", e);
+    } finally {
+      hideLoader();
+    }
   }
 
   init();

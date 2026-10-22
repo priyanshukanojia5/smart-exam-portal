@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const crypto = require('node:crypto');
 const path = require('node:path');
+const fs = require('node:fs');
 const db = require('./db');
 
 const app = express();
@@ -13,7 +14,7 @@ app.use(express.json());
 
 // Serve static frontend files (from public or root)
 const publicFolder = path.join(__dirname, 'public');
-if (require('node:fs').existsSync(publicFolder)) {
+if (fs.existsSync(publicFolder)) {
   app.use(express.static(publicFolder));
 }
 app.use(express.static(__dirname));
@@ -34,10 +35,11 @@ function authMiddleware(req, res, next) {
 
 app.use(authMiddleware);
 
-// --- API ROUTES ---
+// --- API ROUTES ROUTER ---
+const apiRouter = express.Router();
 
 // 1. Health and database status
-app.get('/api/status', (req, res) => {
+apiRouter.get('/status', (req, res) => {
   try {
     const dbStatus = db.getDatabaseStatus();
     res.json({
@@ -51,7 +53,7 @@ app.get('/api/status', (req, res) => {
 });
 
 // 2. Authentication: Register
-app.post('/api/auth/register', (req, res) => {
+apiRouter.post('/auth/register', (req, res) => {
   try {
     const { name, email, password } = req.body;
     if (!name || name.trim().length < 2) {
@@ -85,7 +87,7 @@ app.post('/api/auth/register', (req, res) => {
 });
 
 // 3. Authentication: Login
-app.post('/api/auth/login', (req, res) => {
+apiRouter.post('/auth/login', (req, res) => {
   try {
     const { email, password } = req.body;
     if (!email || !password) {
@@ -117,7 +119,7 @@ app.post('/api/auth/login', (req, res) => {
 });
 
 // 4. Current user session check
-app.get('/api/auth/me', (req, res) => {
+apiRouter.get('/auth/me', (req, res) => {
   if (!req.user) {
     return res.status(401).json({ user: null });
   }
@@ -125,7 +127,7 @@ app.get('/api/auth/me', (req, res) => {
 });
 
 // 5. Authentication: Logout
-app.post('/api/auth/logout', (req, res) => {
+apiRouter.post('/auth/logout', (req, res) => {
   if (req.token) {
     db.deleteSession(req.token);
   }
@@ -133,7 +135,7 @@ app.post('/api/auth/logout', (req, res) => {
 });
 
 // 6. Get all available exams
-app.get('/api/exams', (req, res) => {
+apiRouter.get('/exams', (req, res) => {
   try {
     const exams = db.getAllExams();
     res.json(exams);
@@ -143,7 +145,7 @@ app.get('/api/exams', (req, res) => {
 });
 
 // 7. Get single exam with questions
-app.get('/api/exams/:slug', (req, res) => {
+apiRouter.get('/exams/:slug', (req, res) => {
   try {
     const exam = db.getExamBySlug(req.params.slug, false);
     if (!exam) {
@@ -156,7 +158,7 @@ app.get('/api/exams/:slug', (req, res) => {
 });
 
 // 8. Submit and grade exam
-app.post('/api/exams/:slug/submit', (req, res) => {
+apiRouter.post('/exams/:slug/submit', (req, res) => {
   try {
     const { answers, auto } = req.body;
     const userId = req.user ? req.user.id : null;
@@ -178,7 +180,7 @@ app.post('/api/exams/:slug/submit', (req, res) => {
 });
 
 // 9. Get user attempts
-app.get('/api/attempts', (req, res) => {
+apiRouter.get('/attempts', (req, res) => {
   try {
     const userEmail = req.user ? req.user.email : (req.query.email || 'guest');
     const attempts = db.getAttempts(userEmail);
@@ -189,7 +191,7 @@ app.get('/api/attempts', (req, res) => {
 });
 
 // 10. Clear user attempts
-app.delete('/api/attempts', (req, res) => {
+apiRouter.delete('/attempts', (req, res) => {
   try {
     const userEmail = req.user ? req.user.email : (req.query.email || 'guest');
     const deletedCount = db.clearAttempts(userEmail);
@@ -200,7 +202,7 @@ app.delete('/api/attempts', (req, res) => {
 });
 
 // 11. Dashboard statistics
-app.get('/api/stats', (req, res) => {
+apiRouter.get('/stats', (req, res) => {
   try {
     const userEmail = req.user ? req.user.email : (req.query.email || null);
     const stats = db.getStats(userEmail);
@@ -210,8 +212,16 @@ app.get('/api/stats', (req, res) => {
   }
 });
 
+// Mount routes on BOTH /api and / for universal compatibility
+app.use('/api', apiRouter);
+app.use('/', apiRouter);
+
 // Fallback to index.html for root navigation
 app.get('/', (req, res) => {
+  const publicIndex = path.join(__dirname, 'public', 'index.html');
+  if (fs.existsSync(publicIndex)) {
+    return res.sendFile(publicIndex);
+  }
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 

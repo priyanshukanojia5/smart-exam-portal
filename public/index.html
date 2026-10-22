@@ -27,7 +27,18 @@ body.dark .db-badge.offline{background:#362810;color:#fbbf24;border-color:#63451
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
   <div id="scrollProgress" class="scroll-progress"></div>
-  <div id="loader" class="loader-screen" aria-label="Loading application"><div class="loader-mark">E</div><div class="spinner"></div><p>Preparing your exam workspace…</p></div>
+  <div id="loader" class="loader-screen" aria-label="Loading application">
+    <div class="loader-mark">E</div>
+    <div class="spinner"></div>
+    <p>Preparing your exam workspace…</p>
+  </div>
+  <script>
+    // Immediate failsafe: hide loader after 500ms guaranteed
+    setTimeout(function() {
+      var l = document.getElementById('loader');
+      if (l) l.classList.add('done');
+    }, 500);
+  </script>
 
   <header class="site-header">
     <a class="brand" href="#" aria-label="Examly home"><span class="brand-icon">E</span><span>examly<span class="brand-dot">.</span></span></a>
@@ -75,7 +86,7 @@ body.dark .db-badge.offline{background:#362810;color:#fbbf24;border-color:#63451
     </section>
 
     <section id="dashboard" class="section dashboard-section">
-      <div class="section-heading"><div><div class="eyebrow">YOUR LEARNING SPACE</div><h2 id="welcomeHeading">Ready when you are.</h2><p id="dashboardIntro">Sign in to track your attempts, or jump straight into a practice exam.</p></div><button id="dashboardSignIn" class="btn btn-outline">Sign in to save progress</button></div>
+      <div class="section-heading"><div><div class="eyebrow">YOUR LEARNING SPACE</div><h2 id="welcomeHeading">Ready when you are.</h2><p id="dashboardIntro">Sign in to track your attempts in the database, or jump straight into a practice exam.</p></div><button id="dashboardSignIn" class="btn btn-outline">Sign in to save progress</button></div>
       <div id="userSummary" class="user-summary hidden"></div>
       <div class="dashboard-grid">
         <article class="metric-card"><div class="metric-icon purple">▣</div><span class="metric-label">Available exams</span><strong>03</strong><small>Curated practice sets</small></article>
@@ -149,7 +160,7 @@ body.dark .db-badge.offline{background:#362810;color:#fbbf24;border-color:#63451
   "use strict";
 
   const $ = (s, root = document) => root.querySelector(s);
-  const $ = (s, root = document) => [...root.querySelectorAll(s)];
+  const $$ = (s, root = document) => [...root.querySelectorAll(s)];
 
   const storage = {
     get(key, fallback) {
@@ -515,7 +526,7 @@ body.dark .db-badge.offline{background:#362810;color:#fbbf24;border-color:#63451
     toast("You have signed out.");
   });
 
-  $("[data-close]").forEach(b => b.addEventListener("click", () => closeDialog(b.dataset.close)));
+  $$("[data-close]").forEach(b => b.addEventListener("click", () => closeDialog(b.dataset.close)));
 
   $("#themeToggle").addEventListener("click", () => {
     document.body.classList.toggle("dark");
@@ -566,7 +577,7 @@ body.dark .db-badge.offline{background:#362810;color:#fbbf24;border-color:#63451
     }, 1000);
   }
 
-  $(".start-exam").forEach(b => b.addEventListener("click", () => startExam(b.dataset.exam)));
+  $$(".start-exam").forEach(b => b.addEventListener("click", () => startExam(b.dataset.exam)));
   $("#heroStartBtn").addEventListener("click", () => scrollTo("exams"));
   $("#ctaStartBtn").addEventListener("click", () => scrollTo("exams"));
 
@@ -584,7 +595,7 @@ body.dark .db-badge.offline{background:#362810;color:#fbbf24;border-color:#63451
       </button>
     `).join("");
 
-    $(".answer-option").forEach(b => b.addEventListener("click", () => {
+    $$(".answer-option").forEach(b => b.addEventListener("click", () => {
       answers[currentIndex] = Number(b.dataset.option);
       renderQuestion();
     }));
@@ -595,7 +606,7 @@ body.dark .db-badge.offline{background:#362810;color:#fbbf24;border-color:#63451
       </button>
     `).join("");
 
-    $(".q-nav-btn").forEach(b => b.addEventListener("click", () => {
+    $$(".q-nav-btn").forEach(b => b.addEventListener("click", () => {
       currentIndex = Number(b.dataset.q);
       renderQuestion();
     }));
@@ -841,14 +852,24 @@ body.dark .db-badge.offline{background:#362810;color:#fbbf24;border-color:#63451
     $("#themeToggle").textContent = "☾";
   }
 
+  function hideLoader() {
+    const el = $("#loader");
+    if (el) el.classList.add("done");
+  }
+
   // Initialization lifecycle
   async function init() {
+    setTimeout(hideLoader, 500);
     renderUser();
-    await checkBackendStatus();
-    await syncSession();
-    await syncAttempts();
-    window.addEventListener("load", () => setTimeout(() => $("#loader").classList.add("done"), 350));
-    setTimeout(() => $("#loader").classList.add("done"), 1200);
+    try {
+      await checkBackendStatus();
+      await syncSession();
+      await syncAttempts();
+    } catch (e) {
+      console.warn("Backend sync error:", e);
+    } finally {
+      hideLoader();
+    }
   }
 
   init();
