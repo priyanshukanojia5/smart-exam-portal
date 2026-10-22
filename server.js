@@ -11,7 +11,11 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
-// Serve static frontend files
+// Serve static frontend files (from public or root)
+const publicFolder = path.join(__dirname, 'public');
+if (require('node:fs').existsSync(publicFolder)) {
+  app.use(express.static(publicFolder));
+}
 app.use(express.static(__dirname));
 
 // Optional Auth Middleware
