@@ -71,9 +71,9 @@ ${css}
         <div class="exam-preview">
           <div class="preview-top"><span class="preview-pill"><i></i> LIVE PREVIEW</span><span class="preview-dots">•••</span></div>
           <div class="preview-title">Data Structures & Algorithms <span class="mini-tag">PRACTICE</span></div>
-          <div class="preview-meta"><span>◷ 15 minutes</span><span>▤ 5 questions</span></div>
+          <div class="preview-meta"><span>◷ 20 minutes</span><span>▤ 20 questions</span></div>
           <div class="preview-line"></div>
-          <p class="question-label">QUESTION 01 <span>01 / 05</span></p>
+          <p class="question-label">QUESTION 01 <span>01 / 20</span></p>
           <h3>Which data structure follows the LIFO principle?</h3>
           <div class="preview-option selected"><span class="option-letter">A</span> Stack <span class="check">✓</span></div>
           <div class="preview-option"><span class="option-letter">B</span> Queue</div>
@@ -105,15 +105,15 @@ ${css}
       <div class="exam-grid">
         <article class="exam-card featured-exam">
           <div class="exam-art art-purple"><span class="art-symbol">⌘</span><span class="art-chip">MOST POPULAR</span><div class="art-grid"></div></div>
-          <div class="exam-card-content"><div class="card-tags"><span>COMPUTER SCIENCE</span><span class="level level-mid">INTERMEDIATE</span></div><h3>Data Structures & Algorithms</h3><p>Stacks, queues, searching, sorting, and complexity basics.</p><div class="exam-details"><span>◷ 10 min</span><span>▤ 5 questions</span><span>★ 10 points</span></div><button class="btn btn-primary full-width start-exam" data-exam="dsa">Start exam <span>→</span></button></div>
+          <div class="exam-card-content"><div class="card-tags"><span>COMPUTER SCIENCE</span><span class="level level-mid">INTERMEDIATE</span></div><h3>Data Structures & Algorithms</h3><p>Stacks, queues, searching, sorting, and complexity basics.</p><div class="exam-details"><span>◷ 20 min</span><span>▤ 20 questions</span><span>★ 40 points</span></div><button class="btn btn-primary full-width start-exam" data-exam="dsa">Start exam <span>→</span></button></div>
         </article>
         <article class="exam-card">
           <div class="exam-art art-blue"><span class="art-symbol">{" }</span><span class="art-chip">FOUNDATION</span><div class="art-grid"></div></div>
-          <div class="exam-card-content"><div class="card-tags"><span>PROGRAMMING</span><span class="level level-easy">BEGINNER</span></div><h3>Java Fundamentals</h3><p>Test your understanding of Java syntax and core concepts.</p><div class="exam-details"><span>◷ 8 min</span><span>▤ 5 questions</span><span>★ 10 points</span></div><button class="btn btn-primary full-width start-exam" data-exam="java">Start exam <span>→</span></button></div>
+          <div class="exam-card-content"><div class="card-tags"><span>PROGRAMMING</span><span class="level level-easy">BEGINNER</span></div><h3>Java Fundamentals</h3><p>Test your understanding of Java syntax and core concepts.</p><div class="exam-details"><span>◷ 20 min</span><span>▤ 20 questions</span><span>★ 40 points</span></div><button class="btn btn-primary full-width start-exam" data-exam="java">Start exam <span>→</span></button></div>
         </article>
         <article class="exam-card">
           <div class="exam-art art-green"><span class="art-symbol">⌬</span><span class="art-chip">QUICK PRACTICE</span><div class="art-grid"></div></div>
-          <div class="exam-card-content"><div class="card-tags"><span>WEB TECHNOLOGY</span><span class="level level-easy">BEGINNER</span></div><h3>Web Development Basics</h3><p>HTML, CSS, JavaScript, and the foundations of the web.</p><div class="exam-details"><span>◷ 8 min</span><span>▤ 5 questions</span><span>★ 10 points</span></div><button class="btn btn-primary full-width start-exam" data-exam="web">Start exam <span>→</span></button></div>
+          <div class="exam-card-content"><div class="card-tags"><span>WEB TECHNOLOGY</span><span class="level level-easy">BEGINNER</span></div><h3>Web Development Basics</h3><p>HTML, CSS, JavaScript, and the foundations of the web.</p><div class="exam-details"><span>◷ 20 min</span><span>▤ 20 questions</span><span>★ 40 points</span></div><button class="btn btn-primary full-width start-exam" data-exam="web">Start exam <span>→</span></button></div>
         </article>
       </div>
     </section>
@@ -149,7 +149,7 @@ ${css}
       <div class="exam-topbar"><a class="brand" href="#"><span class="brand-icon">E</span><span>examly<span class="brand-dot">.</span></span></a><div class="exam-top-meta"><span id="examSubject">PRACTICE EXAM</span><span class="timer" id="examTimer">10:00</span><button class="icon-btn" id="exitExamBtn" aria-label="Exit exam">×</button></div></div>
       <div class="exam-progress-track"><div id="examProgressBar"></div></div>
       <div class="exam-body"><aside class="question-sidebar"><span class="eyebrow">YOUR QUESTIONS</span><div id="questionNav" class="question-nav"></div><div class="sidebar-tip"><span>✦</span><strong>Take your time</strong><p>Read each question carefully. You can revisit answers before submitting.</p></div></aside>
-        <section class="question-area"><div class="question-meta"><span id="questionCountLabel">QUESTION 01 OF 05</span><span class="points-label">2 POINTS</span></div><h2 id="questionTitle">Question text</h2><p id="questionHint" class="question-hint">Choose one answer.</p><div id="answerOptions" class="answer-options"></div><div class="question-actions"><button id="prevQuestionBtn" class="btn btn-outline">← Previous</button><span id="answeredCount">0 of 5 answered</span><button id="nextQuestionBtn" class="btn btn-primary">Next question →</button><button id="submitExamBtn" class="btn btn-primary hidden">Submit exam ✓</button></div></section>
+        <section class="question-area"><div class="question-meta"><span id="questionCountLabel">QUESTION 01 OF 20</span><span class="points-label">2 POINTS</span></div><h2 id="questionTitle">Question text</h2><p id="questionHint" class="question-hint">Choose one answer.</p><div id="answerOptions" class="answer-options"></div><div class="question-actions"><button id="prevQuestionBtn" class="btn btn-outline">← Previous</button><span id="answeredCount">0 of 20 answered</span><button id="nextQuestionBtn" class="btn btn-primary">Next question →</button><button id="submitExamBtn" class="btn btn-primary hidden">Submit exam ✓</button></div></section>
       </div>
     </div>
   </dialog>

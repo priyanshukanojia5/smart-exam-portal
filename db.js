@@ -1,7 +1,16 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const { DatabaseSync } = require('node:sqlite');
+const crypto = require('node:crypto');
 const bcrypt = require('bcryptjs');
+const questionBank = require('./questions-bank.json');
+
+// Every attempt gets this many randomly chosen questions from the subject's question bank.
+const QUIZ_SIZE = 20;
+// Time allowed for a full-size attempt (seconds). 60 seconds per question.
+const QUIZ_TIME_SECONDS = QUIZ_SIZE * 60;
+// Extra seconds allowed after the deadline (network delay / auto-submit) before a submit is rejected.
+const SUBMIT_GRACE_SECONDS = 60;
 
 const isVercel = !!process.env.VERCEL;
 let DB_PATH = path.join(__dirname, 'exam_portal.db');
@@ -122,10 +131,72 @@ function initDatabase() {
     );
   `);
 
+  // 8. Exam sessions: one row per started attempt, remembers which random questions were picked
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS exam_sessions (
+      id TEXT PRIMARY KEY,
+      user_id INTEGER,
+      exam_id INTEGER NOT NULL,
+      question_ids TEXT NOT NULL,
+      started_at TEXT NOT NULL DEFAULT (datetime('now')),
+      expires_at TEXT NOT NULL,
+      submitted INTEGER NOT NULL DEFAULT 0,
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL,
+      FOREIGN KEY (exam_id) REFERENCES exams(id) ON DELETE CASCADE
+    );
+  `);
+
   // Check if exams need to be seeded
   const examCount = db.prepare('SELECT COUNT(*) as count FROM exams').get().count;
   if (examCount === 0) {
     seedDatabase();
+  }
+
+  // Make sure every exam has the full question bank (safe to run on every start:
+  // questions that already exist are skipped, so it also upgrades older databases).
+  syncQuestionBank();
+}
+
+// Adds any missing questions from questions-bank.json to the matching exams.
+function syncQuestionBank() {
+  const findExam = db.prepare('SELECT id FROM exams WHERE slug = ?');
+  const existing = db.prepare('SELECT question_text FROM questions WHERE exam_id = ?');
+  const nextOrder = db.prepare('SELECT COALESCE(MAX(order_num), -1) + 1 AS n FROM questions WHERE exam_id = ?');
+  const insertQuestion = db.prepare(
+    'INSERT INTO questions (exam_id, question_text, explanation, order_num) VALUES (?, ?, ?, ?)'
+  );
+  const insertOption = db.prepare(
+    'INSERT INTO question_options (question_id, option_text, option_index, is_correct) VALUES (?, ?, ?, ?)'
+  );
+  const raiseTime = db.prepare('UPDATE exams SET time_limit = ? WHERE id = ? AND time_limit < ?');
+
+  db.exec('BEGIN');
+  try {
+    let added = 0;
+    for (const [slug, list] of Object.entries(questionBank)) {
+      const exam = findExam.get(slug);
+      if (!exam) continue;
+
+      const have = new Set(existing.all(exam.id).map(r => r.question_text));
+      let order = Number(nextOrder.get(exam.id).n);
+
+      for (const q of list) {
+        if (have.has(q.q)) continue;
+        const res = insertQuestion.run(exam.id, q.q, q.explain, order++);
+        const questionId = Number(res.lastInsertRowid);
+        q.options.forEach((text, idx) => insertOption.run(questionId, text, idx, idx === q.answer ? 1 : 0));
+        have.add(q.q);
+        added++;
+      }
+
+      // 20 questions need more than the old 8-10 minute limit
+      raiseTime.run(QUIZ_TIME_SECONDS, exam.id, QUIZ_TIME_SECONDS);
+    }
+    db.exec('COMMIT');
+    if (added > 0) console.log(`Question bank synced: ${added} new question(s) added.`);
+  } catch (err) {
+    db.exec('ROLLBACK');
+    console.error('Could not sync question bank:', err.message);
   }
 }
 
@@ -392,7 +463,10 @@ function getAllExams() {
     timeLimit: e.time_limit,
     pointsPerQuestion: e.points_per_question,
     questionCount: Number(e.question_count),
-    totalPoints: Number(e.question_count) * e.points_per_question
+    totalPoints: Number(e.question_count) * e.points_per_question,
+    // What a single attempt will actually contain
+    quizSize: Math.min(QUIZ_SIZE, Number(e.question_count)),
+    quizPoints: Math.min(QUIZ_SIZE, Number(e.question_count)) * e.points_per_question
   }));
 }
 
@@ -544,6 +618,197 @@ function gradeAndSaveAttempt({ examSlug, answers, userId = null, userEmail = 'gu
   };
 }
 
+// ---------------------------------------------------------------------------
+// Random-question exam sessions
+// ---------------------------------------------------------------------------
+function examError(message, status) {
+  const err = new Error(message);
+  err.status = status;
+  return err;
+}
+
+// Starts an attempt: picks QUIZ_SIZE random questions and remembers them server-side.
+// The returned questions never include the correct answers.
+function startExamSession(slug, userId = null) {
+  const exam = db.prepare('SELECT * FROM exams WHERE slug = ?').get(slug);
+  if (!exam) return null;
+
+  // Clean up sessions that are more than a day old
+  db.prepare('DELETE FROM exam_sessions WHERE expires_at < ?')
+    .run(new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString());
+
+  const picked = db.prepare(
+    'SELECT id, question_text FROM questions WHERE exam_id = ? ORDER BY RANDOM() LIMIT ?'
+  ).all(exam.id, QUIZ_SIZE);
+  if (picked.length === 0) throw examError('This exam has no questions yet.', 409);
+
+  const ids = picked.map(q => Number(q.id));
+  const marks = ids.map(() => '?').join(',');
+  const optionRows = db.prepare(
+    `SELECT question_id, option_text, option_index FROM question_options
+     WHERE question_id IN (${marks}) ORDER BY question_id, option_index ASC`
+  ).all(...ids);
+
+  const optionsByQuestion = new Map();
+  for (const row of optionRows) {
+    const key = Number(row.question_id);
+    if (!optionsByQuestion.has(key)) optionsByQuestion.set(key, []);
+    optionsByQuestion.get(key).push(row.option_text);
+  }
+
+  const sessionId = crypto.randomUUID();
+  const expiresAt = new Date(Date.now() + exam.time_limit * 1000).toISOString();
+  db.prepare(
+    'INSERT INTO exam_sessions (id, user_id, exam_id, question_ids, expires_at) VALUES (?, ?, ?, ?, ?)'
+  ).run(sessionId, userId, exam.id, JSON.stringify(ids), expiresAt);
+
+  return {
+    sessionId,
+    id: exam.id,
+    slug: exam.slug,
+    title: exam.title,
+    description: exam.description,
+    category: exam.category,
+    difficulty: exam.difficulty,
+    time: exam.time_limit,
+    expiresAt,
+    pointsPerQuestion: exam.points_per_question,
+    quizSize: ids.length,
+    questions: picked.map((q, i) => ({
+      id: Number(q.id),
+      q: q.question_text,
+      options: optionsByQuestion.get(Number(q.id)) || [],
+      order: i
+    }))
+  };
+}
+
+// Grades a session. `answers` is an object: { [questionId]: selectedOptionIndex }.
+function gradeSession({ sessionId, examSlug, answers, requesterId = null, autoSubmitted = false }) {
+  const session = db.prepare('SELECT * FROM exam_sessions WHERE id = ?').get(sessionId);
+  if (!session) throw examError('Exam session not found. Please start the exam again.', 404);
+
+  const exam = db.prepare('SELECT * FROM exams WHERE id = ?').get(session.exam_id);
+  if (!exam || (examSlug && exam.slug !== examSlug)) {
+    throw examError('This session does not belong to that exam.', 400);
+  }
+  if (session.user_id !== null && Number(session.user_id) !== Number(requesterId)) {
+    throw examError('This exam session belongs to another user.', 403);
+  }
+  if (session.submitted) throw examError('This attempt was already submitted.', 409);
+
+  const deadline = new Date(session.expires_at).getTime() + SUBMIT_GRACE_SECONDS * 1000;
+  if (Date.now() > deadline) {
+    throw examError('Time is up. This attempt can no longer be submitted. Please start a new one.', 410);
+  }
+
+  // The attempt is recorded for the account that started it, never for an email sent by the client
+  let userId = null;
+  let userEmail = 'guest';
+  if (session.user_id !== null) {
+    const owner = findUserById(session.user_id);
+    if (owner) {
+      userId = Number(owner.id);
+      userEmail = owner.email;
+    }
+  }
+
+  const ids = JSON.parse(session.question_ids);
+  const marks = ids.map(() => '?').join(',');
+  const questionRows = db.prepare(`SELECT * FROM questions WHERE id IN (${marks})`).all(...ids);
+  const questionById = new Map(questionRows.map(q => [Number(q.id), q]));
+  const optionRows = db.prepare(
+    `SELECT question_id, option_text, option_index, is_correct FROM question_options
+     WHERE question_id IN (${marks}) ORDER BY question_id, option_index ASC`
+  ).all(...ids);
+  const optionsByQuestion = new Map();
+  for (const row of optionRows) {
+    const key = Number(row.question_id);
+    if (!optionsByQuestion.has(key)) optionsByQuestion.set(key, []);
+    optionsByQuestion.get(key).push(row);
+  }
+
+  let correctCount = 0;
+  const reviewQuestions = [];
+
+  for (const id of ids) {
+    const q = questionById.get(Number(id));
+    if (!q) continue;
+    const options = optionsByQuestion.get(Number(id)) || [];
+    const correctOption = options.find(o => Number(o.is_correct) === 1);
+    const correctAnswerIndex = correctOption ? Number(correctOption.option_index) : 0;
+
+    const raw = answers ? answers[id] : undefined;
+    const selectedAnswer = Number.isInteger(raw) && raw >= 0 && raw < options.length ? raw : null;
+    const isCorrect = selectedAnswer !== null && selectedAnswer === correctAnswerIndex;
+    if (isCorrect) correctCount++;
+
+    reviewQuestions.push({
+      questionId: Number(id),
+      q: q.question_text,
+      options: options.map(o => o.option_text),
+      selectedAnswer,
+      correctAnswer: correctAnswerIndex,
+      isCorrect,
+      explain: q.explanation
+    });
+  }
+
+  const total = reviewQuestions.length;
+  const points = correctCount * exam.points_per_question;
+  const totalPoints = total * exam.points_per_question;
+  const percent = total > 0 ? Math.round((correctCount / total) * 100) : 0;
+  const incorrectCount = total - correctCount;
+
+  // Save the attempt, its answers and the "submitted" flag together or not at all
+  db.exec('BEGIN IMMEDIATE');
+  let attemptId;
+  try {
+    // Re-check inside the transaction so two simultaneous submits cannot both succeed
+    const fresh = db.prepare('SELECT submitted FROM exam_sessions WHERE id = ?').get(sessionId);
+    if (!fresh || fresh.submitted) throw examError('This attempt was already submitted.', 409);
+
+    const attemptRes = db.prepare(`
+      INSERT INTO attempts (
+        user_id, user_email, exam_id, exam_slug, exam_title,
+        points, total_points, percent, correct_count, incorrect_count, auto_submitted
+      )
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).run(userId, userEmail, exam.id, exam.slug, exam.title,
+      points, totalPoints, percent, correctCount, incorrectCount, autoSubmitted ? 1 : 0);
+    attemptId = Number(attemptRes.lastInsertRowid);
+
+    const insertAnswer = db.prepare(
+      'INSERT INTO attempt_answers (attempt_id, question_id, selected_option, is_correct) VALUES (?, ?, ?, ?)'
+    );
+    for (const rq of reviewQuestions) {
+      insertAnswer.run(attemptId, rq.questionId, rq.selectedAnswer, rq.isCorrect ? 1 : 0);
+    }
+
+    db.prepare('UPDATE exam_sessions SET submitted = 1 WHERE id = ?').run(sessionId);
+    db.exec('COMMIT');
+  } catch (err) {
+    db.exec('ROLLBACK');
+    throw err;
+  }
+
+  return {
+    attemptId,
+    key: exam.slug,
+    title: exam.title,
+    correct: correctCount,
+    incorrect: incorrectCount,
+    points,
+    total: totalPoints,
+    percent,
+    answers: reviewQuestions.map(r => r.selectedAnswer),
+    auto: autoSubmitted,
+    date: new Date().toISOString(),
+    email: userEmail,
+    review: reviewQuestions
+  };
+}
+
 // Fetch attempts for a user
 function getAttempts(userEmail, limit = 20) {
   const attempts = db.prepare(`
@@ -635,6 +900,9 @@ module.exports = {
   getAllExams,
   getExamBySlug,
   gradeAndSaveAttempt,
+  startExamSession,
+  gradeSession,
+  syncQuestionBank,
   getAttempts,
   clearAttempts,
   getStats,

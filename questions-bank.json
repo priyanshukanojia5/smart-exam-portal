@@ -1,0 +1,1163 @@
+{
+  "dsa": [
+    {
+      "q": "What is the worst-case time complexity of quicksort?",
+      "options": [
+        "O(n)",
+        "O(log n)",
+        "O(n^2)",
+        "O(n log n)"
+      ],
+      "answer": 2,
+      "explain": "With consistently bad pivots, quicksort degrades to O(n^2)."
+    },
+    {
+      "q": "Which binary search tree traversal visits nodes in sorted order?",
+      "options": [
+        "Preorder",
+        "Level order",
+        "Inorder",
+        "Postorder"
+      ],
+      "answer": 2,
+      "explain": "Inorder (left, node, right) on a BST yields keys in ascending order."
+    },
+    {
+      "q": "Which data structure does breadth-first search (BFS) use?",
+      "options": [
+        "Stack",
+        "Queue",
+        "Trie",
+        "Heap"
+      ],
+      "answer": 1,
+      "explain": "BFS explores level by level, which needs a FIFO queue."
+    },
+    {
+      "q": "Which data structure does depth-first search (DFS) typically use?",
+      "options": [
+        "Priority queue",
+        "Queue",
+        "Hash map",
+        "Stack (or recursion)"
+      ],
+      "answer": 3,
+      "explain": "DFS goes deep first and backtracks, which a stack or the call stack provides."
+    },
+    {
+      "q": "What is the time complexity of accessing an array element by index?",
+      "options": [
+        "O(n^2)",
+        "O(log n)",
+        "O(1)",
+        "O(n)"
+      ],
+      "answer": 2,
+      "explain": "Arrays are contiguous, so an index maps directly to a memory address."
+    },
+    {
+      "q": "Which of these sorting algorithms is stable?",
+      "options": [
+        "Merge sort",
+        "Heap sort",
+        "Selection sort",
+        "Quick sort"
+      ],
+      "answer": 0,
+      "explain": "Merge sort keeps equal elements in their original relative order."
+    },
+    {
+      "q": "What is the space complexity of merge sort?",
+      "options": [
+        "O(1)",
+        "O(n^2)",
+        "O(n)",
+        "O(log n)"
+      ],
+      "answer": 2,
+      "explain": "Merge sort needs an auxiliary array proportional to the input size."
+    },
+    {
+      "q": "Which data structure offers O(1) average-time lookup by key?",
+      "options": [
+        "Hash table",
+        "Sorted array",
+        "Binary search tree",
+        "Linked list"
+      ],
+      "answer": 0,
+      "explain": "A good hash function gives constant average-time insert and lookup."
+    },
+    {
+      "q": "What is the height of a balanced binary search tree with n nodes?",
+      "options": [
+        "O(n)",
+        "O(log n)",
+        "O(n log n)",
+        "O(1)"
+      ],
+      "answer": 1,
+      "explain": "Balancing keeps the height proportional to log n."
+    },
+    {
+      "q": "In a min-heap, where is the smallest element?",
+      "options": [
+        "In the middle",
+        "At the root",
+        "At the last level",
+        "At a leaf"
+      ],
+      "answer": 1,
+      "explain": "The heap property puts the minimum at the root."
+    },
+    {
+      "q": "Which algorithm finds shortest paths in a graph with non-negative edge weights?",
+      "options": [
+        "Kruskal's algorithm",
+        "Dijkstra's algorithm",
+        "Topological sort",
+        "Prim's algorithm"
+      ],
+      "answer": 1,
+      "explain": "Dijkstra's algorithm greedily expands the closest unvisited vertex."
+    },
+    {
+      "q": "Which algorithm builds a minimum spanning tree by repeatedly adding the cheapest edge that does not form a cycle?",
+      "options": [
+        "Dijkstra's algorithm",
+        "Bellman-Ford",
+        "Kruskal's algorithm",
+        "Floyd-Warshall"
+      ],
+      "answer": 2,
+      "explain": "Kruskal's sorts edges by weight and uses union-find to avoid cycles."
+    },
+    {
+      "q": "What is the time complexity of inserting a node at the head of a singly linked list?",
+      "options": [
+        "O(1)",
+        "O(n^2)",
+        "O(log n)",
+        "O(n)"
+      ],
+      "answer": 0,
+      "explain": "Only a couple of pointers change, regardless of list length."
+    },
+    {
+      "q": "Which data structure is the natural choice for implementing an undo feature?",
+      "options": [
+        "Stack",
+        "Graph",
+        "Array of strings",
+        "Queue"
+      ],
+      "answer": 0,
+      "explain": "The most recent action must be undone first, which is LIFO order."
+    },
+    {
+      "q": "How many edges does a tree with n nodes have?",
+      "options": [
+        "2n",
+        "n - 1",
+        "n",
+        "n + 1"
+      ],
+      "answer": 1,
+      "explain": "A connected acyclic graph with n vertices always has n - 1 edges."
+    },
+    {
+      "q": "Which sorting algorithm performs best on nearly sorted data?",
+      "options": [
+        "Heap sort",
+        "Selection sort",
+        "Insertion sort",
+        "Quick sort"
+      ],
+      "answer": 2,
+      "explain": "Insertion sort runs close to O(n) when few elements are out of place."
+    },
+    {
+      "q": "What is the best-case time complexity of bubble sort with an early-exit flag?",
+      "options": [
+        "O(n^2)",
+        "O(log n)",
+        "O(n)",
+        "O(n log n)"
+      ],
+      "answer": 2,
+      "explain": "On already sorted input, one pass with no swaps lets it stop early."
+    },
+    {
+      "q": "Which data structure is commonly used to implement a priority queue?",
+      "options": [
+        "Circular array",
+        "Stack",
+        "Singly linked list",
+        "Heap"
+      ],
+      "answer": 3,
+      "explain": "A binary heap gives O(log n) insertion and removal of the top priority."
+    },
+    {
+      "q": "What is a collision in hashing?",
+      "options": [
+        "Two different keys mapping to the same index",
+        "A key that cannot be found",
+        "An empty hash table",
+        "A crash in the hash function"
+      ],
+      "answer": 0,
+      "explain": "Collisions occur when distinct keys hash to the same bucket."
+    },
+    {
+      "q": "Which collision-resolution technique stores colliding keys in a list at the same bucket?",
+      "options": [
+        "Separate chaining",
+        "Double hashing",
+        "Quadratic probing",
+        "Linear probing"
+      ],
+      "answer": 0,
+      "explain": "Separate chaining keeps a linked list (or similar) per bucket."
+    },
+    {
+      "q": "Topological sorting is defined for which kind of graph?",
+      "options": [
+        "Directed acyclic graphs",
+        "Graphs containing cycles",
+        "Undirected graphs",
+        "Complete graphs only"
+      ],
+      "answer": 0,
+      "explain": "A topological order exists only if the directed graph has no cycles."
+    },
+    {
+      "q": "Which recurrence describes binary search?",
+      "options": [
+        "T(n) = T(n-1) + O(1)",
+        "T(n) = T(n/2) + O(1)",
+        "T(n) = 2T(n/2) + O(n)",
+        "T(n) = 2T(n-1)"
+      ],
+      "answer": 1,
+      "explain": "Each step halves the search range using constant work."
+    },
+    {
+      "q": "Which of these is NOT a linear data structure?",
+      "options": [
+        "Queue",
+        "Array",
+        "Stack",
+        "Tree"
+      ],
+      "answer": 3,
+      "explain": "A tree is hierarchical, not linear."
+    },
+    {
+      "q": "In a 0-indexed array representation of a binary heap, where is the left child of the node at index i?",
+      "options": [
+        "2i",
+        "i / 2",
+        "2i + 1",
+        "2i + 2"
+      ],
+      "answer": 2,
+      "explain": "With 0-based indexing, children are at 2i + 1 and 2i + 2."
+    },
+    {
+      "q": "Which of these algorithms follows the divide and conquer approach?",
+      "options": [
+        "Insertion sort",
+        "Merge sort",
+        "Selection sort",
+        "Bubble sort"
+      ],
+      "answer": 1,
+      "explain": "Merge sort splits the array, sorts the halves, and merges them."
+    },
+    {
+      "q": "What is the time complexity of heap sort?",
+      "options": [
+        "O(n^2)",
+        "O(n log n)",
+        "O(n)",
+        "O(log n)"
+      ],
+      "answer": 1,
+      "explain": "Building the heap is O(n) and n extractions cost O(log n) each."
+    },
+    {
+      "q": "Dynamic programming is applicable when a problem has which properties?",
+      "options": [
+        "Overlapping subproblems and optimal substructure",
+        "Sorted inputs only",
+        "Random inputs only",
+        "No repeated subproblems"
+      ],
+      "answer": 0,
+      "explain": "DP stores results of repeated subproblems and builds optimal solutions from them."
+    },
+    {
+      "q": "What does a greedy algorithm do?",
+      "options": [
+        "Always backtracks",
+        "Guesses randomly",
+        "Tries every possible solution",
+        "Makes the locally best choice at each step"
+      ],
+      "answer": 3,
+      "explain": "Greedy algorithms commit to the best-looking option at each stage."
+    },
+    {
+      "q": "What does \"deque\" stand for?",
+      "options": [
+        "Directed queue",
+        "Dynamic queue",
+        "Delayed queue",
+        "Double-ended queue"
+      ],
+      "answer": 3,
+      "explain": "A deque allows insertion and removal at both ends."
+    },
+    {
+      "q": "Which tree traversal visits the root node first?",
+      "options": [
+        "Inorder",
+        "Preorder",
+        "Postorder",
+        "Reverse inorder"
+      ],
+      "answer": 1,
+      "explain": "Preorder visits node, then left subtree, then right subtree."
+    },
+    {
+      "q": "How much space does an adjacency matrix use for a graph with V vertices?",
+      "options": [
+        "O(V)",
+        "O(V^2)",
+        "O(V + E)",
+        "O(E)"
+      ],
+      "answer": 1,
+      "explain": "It stores one entry for every ordered pair of vertices."
+    },
+    {
+      "q": "What is the best-case time complexity of linear search?",
+      "options": [
+        "O(n^2)",
+        "O(log n)",
+        "O(1)",
+        "O(n)"
+      ],
+      "answer": 2,
+      "explain": "If the target is the first element, only one comparison is needed."
+    },
+    {
+      "q": "What balance factors are allowed in an AVL tree?",
+      "options": [
+        "-1, 0 and 1",
+        "Only 0",
+        "-2 to 2",
+        "Any value"
+      ],
+      "answer": 0,
+      "explain": "AVL trees rebalance whenever a node's subtree heights differ by more than 1."
+    },
+    {
+      "q": "What commonly causes a stack overflow error?",
+      "options": [
+        "Dividing by zero",
+        "An empty queue",
+        "A hash collision",
+        "Infinite or very deep recursion"
+      ],
+      "answer": 3,
+      "explain": "Each call adds a frame to the call stack, which has limited size."
+    },
+    {
+      "q": "Floyd's tortoise and hare technique is used to solve which problem?",
+      "options": [
+        "Sorting an array",
+        "Detecting a cycle in a linked list",
+        "Finding the median",
+        "Balancing a tree"
+      ],
+      "answer": 1,
+      "explain": "A slow and a fast pointer will meet if the list contains a cycle."
+    }
+  ],
+  "java": [
+    {
+      "q": "Which keyword prevents a class from being subclassed?",
+      "options": [
+        "final",
+        "private",
+        "abstract",
+        "static"
+      ],
+      "answer": 0,
+      "explain": "A final class cannot be extended."
+    },
+    {
+      "q": "What is the default value of an int instance variable in Java?",
+      "options": [
+        "-1",
+        "undefined",
+        "null",
+        "0"
+      ],
+      "answer": 3,
+      "explain": "Numeric instance fields default to zero."
+    },
+    {
+      "q": "Which construct is used to handle exceptions in Java?",
+      "options": [
+        "switch",
+        "for",
+        "if-else",
+        "try-catch"
+      ],
+      "answer": 3,
+      "explain": "Code that may fail goes in try, and errors are handled in catch."
+    },
+    {
+      "q": "Which interface does ArrayList implement?",
+      "options": [
+        "Queue",
+        "List",
+        "Set",
+        "Map"
+      ],
+      "answer": 1,
+      "explain": "ArrayList is a resizable-array implementation of the List interface."
+    },
+    {
+      "q": "What does the static keyword mean on a method?",
+      "options": [
+        "It can never be called",
+        "It runs once at program startup",
+        "It is private to the class",
+        "It belongs to the class rather than to an instance"
+      ],
+      "answer": 3,
+      "explain": "Static methods are called on the class itself without creating an object."
+    },
+    {
+      "q": "Which keyword refers to the current object?",
+      "options": [
+        "self",
+        "this",
+        "super",
+        "current"
+      ],
+      "answer": 1,
+      "explain": "this is a reference to the object whose method or constructor is running."
+    },
+    {
+      "q": "Which loop is guaranteed to run its body at least once?",
+      "options": [
+        "do-while",
+        "for",
+        "for-each",
+        "while"
+      ],
+      "answer": 0,
+      "explain": "do-while checks its condition after executing the body."
+    },
+    {
+      "q": "Which access modifier gives the widest visibility?",
+      "options": [
+        "public",
+        "protected",
+        "private",
+        "package-private (default)"
+      ],
+      "answer": 0,
+      "explain": "public members are accessible from anywhere."
+    },
+    {
+      "q": "What is method overloading?",
+      "options": [
+        "Hiding a field in a subclass",
+        "A method calling itself",
+        "Several methods with the same name but different parameters",
+        "A subclass replacing a parent method"
+      ],
+      "answer": 2,
+      "explain": "Overloads are resolved at compile time by their parameter lists."
+    },
+    {
+      "q": "When does method overriding occur?",
+      "options": [
+        "Two methods in one class share a name",
+        "A method calls itself",
+        "A constructor is inherited",
+        "A subclass provides its own implementation of an inherited method"
+      ],
+      "answer": 3,
+      "explain": "Overriding replaces the superclass behavior at runtime."
+    },
+    {
+      "q": "Which class is the root of every Java class hierarchy?",
+      "options": [
+        "System",
+        "Class",
+        "Object",
+        "Main"
+      ],
+      "answer": 2,
+      "explain": "Every class directly or indirectly extends java.lang.Object."
+    },
+    {
+      "q": "Which keyword is used to implement an interface?",
+      "options": [
+        "extends",
+        "inherits",
+        "implements",
+        "uses"
+      ],
+      "answer": 2,
+      "explain": "A class declares the interfaces it fulfills with implements."
+    },
+    {
+      "q": "Can a Java class extend more than one class?",
+      "options": [
+        "Yes, by using extends twice",
+        "Yes, up to two classes",
+        "Only abstract classes can",
+        "No, Java allows only single class inheritance"
+      ],
+      "answer": 3,
+      "explain": "Java avoids multiple class inheritance; multiple interfaces are allowed instead."
+    },
+    {
+      "q": "Which collection stores key-value pairs?",
+      "options": [
+        "ArrayList",
+        "HashSet",
+        "Stack",
+        "HashMap"
+      ],
+      "answer": 3,
+      "explain": "A Map associates each unique key with a value."
+    },
+    {
+      "q": "Which keyword is used to create a new object?",
+      "options": [
+        "new",
+        "make",
+        "create",
+        "alloc"
+      ],
+      "answer": 0,
+      "explain": "new allocates memory and calls a constructor."
+    },
+    {
+      "q": "How many bits does an int occupy in Java?",
+      "options": [
+        "32",
+        "64",
+        "8",
+        "16"
+      ],
+      "answer": 0,
+      "explain": "Java fixes int at 32 bits regardless of platform."
+    },
+    {
+      "q": "Which of these is a checked exception?",
+      "options": [
+        "IOException",
+        "NullPointerException",
+        "ArrayIndexOutOfBoundsException",
+        "ArithmeticException"
+      ],
+      "answer": 0,
+      "explain": "Checked exceptions such as IOException must be caught or declared."
+    },
+    {
+      "q": "What does the finally block do?",
+      "options": [
+        "Runs whether or not an exception occurs",
+        "Runs only when no exception occurs",
+        "Replaces the catch block",
+        "Runs only when an exception occurs"
+      ],
+      "answer": 0,
+      "explain": "finally is used for cleanup that must always happen."
+    },
+    {
+      "q": "Which statement about Java Strings is true?",
+      "options": [
+        "Strings can be changed in place",
+        "Strings cannot be compared",
+        "String is a primitive type",
+        "String objects are immutable"
+      ],
+      "answer": 3,
+      "explain": "Operations on a String create a new String instead of modifying it."
+    },
+    {
+      "q": "Which method should be used to compare the contents of two Strings?",
+      "options": [
+        "same()",
+        "compare()",
+        "equals()",
+        "=="
+      ],
+      "answer": 2,
+      "explain": "== compares references, while equals() compares character content."
+    },
+    {
+      "q": "What can an abstract class contain?",
+      "options": [
+        "No constructors",
+        "Only static methods",
+        "Both abstract and concrete methods",
+        "Only abstract methods"
+      ],
+      "answer": 2,
+      "explain": "Abstract classes may mix unimplemented and implemented methods."
+    },
+    {
+      "q": "Which package is imported automatically in every Java file?",
+      "options": [
+        "java.net",
+        "java.io",
+        "java.lang",
+        "java.util"
+      ],
+      "answer": 2,
+      "explain": "java.lang holds core classes like String and Object."
+    },
+    {
+      "q": "What is the purpose of a constructor?",
+      "options": [
+        "To initialize a newly created object",
+        "To import packages",
+        "To return a computed value",
+        "To destroy an object"
+      ],
+      "answer": 0,
+      "explain": "Constructors run when an object is created and set up its state."
+    },
+    {
+      "q": "Which of these is NOT a core OOP principle?",
+      "options": [
+        "Polymorphism",
+        "Inheritance",
+        "Compilation",
+        "Encapsulation"
+      ],
+      "answer": 2,
+      "explain": "The four pillars are encapsulation, inheritance, polymorphism, and abstraction."
+    },
+    {
+      "q": "What does Java garbage collection do?",
+      "options": [
+        "Automatically frees memory of unreachable objects",
+        "Compiles source code",
+        "Deletes unused files",
+        "Frees only static variables"
+      ],
+      "answer": 0,
+      "explain": "The JVM reclaims heap memory that is no longer referenced."
+    },
+    {
+      "q": "Which keyword is used to throw an exception manually?",
+      "options": [
+        "throws",
+        "catch",
+        "throw",
+        "raise"
+      ],
+      "answer": 2,
+      "explain": "throw raises an exception instance; throws only declares it."
+    },
+    {
+      "q": "Which collection keeps insertion order and allows duplicate elements?",
+      "options": [
+        "ArrayList",
+        "PriorityQueue",
+        "TreeSet",
+        "HashSet"
+      ],
+      "answer": 0,
+      "explain": "ArrayList preserves the order elements were added and permits duplicates."
+    },
+    {
+      "q": "What is Java bytecode?",
+      "options": [
+        "Assembly language",
+        "Platform-independent code executed by the JVM",
+        "Human-readable source code",
+        "Native machine code"
+      ],
+      "answer": 1,
+      "explain": "The compiler produces .class files of bytecode that any JVM can run."
+    },
+    {
+      "q": "Which keyword is used to declare a constant variable?",
+      "options": [
+        "final",
+        "static",
+        "constant",
+        "const"
+      ],
+      "answer": 0,
+      "explain": "A final variable can be assigned only once."
+    },
+    {
+      "q": "What is autoboxing?",
+      "options": [
+        "Packaging a project into a JAR",
+        "Compressing objects in memory",
+        "Automatic conversion between primitives and their wrapper classes",
+        "Converting a String to int only"
+      ],
+      "answer": 2,
+      "explain": "For example, int to Integer happens automatically when needed."
+    },
+    {
+      "q": "What does the super keyword refer to?",
+      "options": [
+        "The current class",
+        "The main method",
+        "A static block",
+        "The parent class"
+      ],
+      "answer": 3,
+      "explain": "super accesses parent-class members and constructors."
+    },
+    {
+      "q": "Which is the correct way to declare and create an int array of size 5?",
+      "options": [
+        "int arr = new int(5);",
+        "array int arr[5];",
+        "int arr = [5];",
+        "int[] arr = new int[5];"
+      ],
+      "answer": 3,
+      "explain": "Arrays are created with new and a size in square brackets."
+    },
+    {
+      "q": "Which interface defines the natural ordering of objects for sorting?",
+      "options": [
+        "Serializable",
+        "Cloneable",
+        "Comparable",
+        "Runnable"
+      ],
+      "answer": 2,
+      "explain": "Classes implement Comparable and define compareTo for natural order."
+    },
+    {
+      "q": "Which keyword makes a method safe for access by only one thread at a time?",
+      "options": [
+        "native",
+        "abstract",
+        "synchronized",
+        "transient"
+      ],
+      "answer": 2,
+      "explain": "synchronized locks the object (or class) while the method executes."
+    },
+    {
+      "q": "What does a method declared with return type void return?",
+      "options": [
+        "null",
+        "An Object",
+        "An int",
+        "No value"
+      ],
+      "answer": 3,
+      "explain": "void methods perform actions without returning a result."
+    }
+  ],
+  "web": [
+    {
+      "q": "Which HTML tag defines the largest heading?",
+      "options": [
+        "<head>",
+        "<h1>",
+        "<title>",
+        "<h6>"
+      ],
+      "answer": 1,
+      "explain": "<h1> is the top-level heading; <h6> is the smallest."
+    },
+    {
+      "q": "Which CSS property controls the space outside an element's border?",
+      "options": [
+        "margin",
+        "outline",
+        "padding",
+        "border-spacing"
+      ],
+      "answer": 0,
+      "explain": "Margin separates an element from its neighbors."
+    },
+    {
+      "q": "Which CSS property adds space between content and the border?",
+      "options": [
+        "gap",
+        "padding",
+        "spacing",
+        "margin"
+      ],
+      "answer": 1,
+      "explain": "Padding is the inner space between content and border."
+    },
+    {
+      "q": "Which CSS selector targets the element with id \"main\"?",
+      "options": [
+        "#main",
+        ".main",
+        "*main",
+        "main"
+      ],
+      "answer": 0,
+      "explain": "The # symbol selects by id."
+    },
+    {
+      "q": "Which CSS selector targets all elements with class \"box\"?",
+      "options": [
+        "&box",
+        "#box",
+        ".box",
+        "box"
+      ],
+      "answer": 2,
+      "explain": "The . symbol selects by class."
+    },
+    {
+      "q": "Which JavaScript array method adds an element to the end of an array?",
+      "options": [
+        "unshift()",
+        "pop()",
+        "push()",
+        "shift()"
+      ],
+      "answer": 2,
+      "explain": "push() appends; pop() removes the last element."
+    },
+    {
+      "q": "What does the === operator do in JavaScript?",
+      "options": [
+        "Compares memory addresses only",
+        "Compares both value and type",
+        "Assigns a value",
+        "Compares value only"
+      ],
+      "answer": 1,
+      "explain": "Strict equality does not perform type coercion."
+    },
+    {
+      "q": "Which HTTP method is typically used to retrieve data?",
+      "options": [
+        "GET",
+        "PUT",
+        "POST",
+        "DELETE"
+      ],
+      "answer": 0,
+      "explain": "GET requests read a resource without changing it."
+    },
+    {
+      "q": "Which HTTP status code means \"Not Found\"?",
+      "options": [
+        "404",
+        "301",
+        "200",
+        "500"
+      ],
+      "answer": 0,
+      "explain": "404 indicates the requested resource does not exist."
+    },
+    {
+      "q": "Which HTTP status code indicates a successful request?",
+      "options": [
+        "500",
+        "200",
+        "404",
+        "302"
+      ],
+      "answer": 1,
+      "explain": "200 OK means the request succeeded."
+    },
+    {
+      "q": "Which HTML tag is used to include JavaScript?",
+      "options": [
+        "<js>",
+        "<script>",
+        "<code>",
+        "<javascript>"
+      ],
+      "answer": 1,
+      "explain": "The <script> element embeds or links JavaScript."
+    },
+    {
+      "q": "Which attribute provides alternative text for an image?",
+      "options": [
+        "src",
+        "alt",
+        "title",
+        "href"
+      ],
+      "answer": 1,
+      "explain": "alt helps screen readers and shows if the image fails to load."
+    },
+    {
+      "q": "What does CSS stand for?",
+      "options": [
+        "Cascading Style Sheets",
+        "Colorful Style Sheets",
+        "Creative Style System",
+        "Computer Style Sheets"
+      ],
+      "answer": 0,
+      "explain": "CSS describes the presentation of HTML documents."
+    },
+    {
+      "q": "Which CSS layout module is designed for one-dimensional layouts?",
+      "options": [
+        "Flexbox",
+        "Grid",
+        "Float",
+        "Table"
+      ],
+      "answer": 0,
+      "explain": "Flexbox lays items out in a row or a column; Grid handles two dimensions."
+    },
+    {
+      "q": "Which declaration turns an element into a flex container?",
+      "options": [
+        "flex: container;",
+        "position: flex;",
+        "display: flex;",
+        "layout: flex;"
+      ],
+      "answer": 2,
+      "explain": "Setting display to flex enables flexbox for its children."
+    },
+    {
+      "q": "Which function converts a JSON string into a JavaScript object?",
+      "options": [
+        "JSON.stringify()",
+        "parseJSON()",
+        "JSON.parse()",
+        "JSON.object()"
+      ],
+      "answer": 2,
+      "explain": "JSON.parse() turns text into a value; stringify does the reverse."
+    },
+    {
+      "q": "Which method returns the first element matching a CSS selector?",
+      "options": [
+        "document.querySelector()",
+        "document.select()",
+        "document.getAll()",
+        "document.find()"
+      ],
+      "answer": 0,
+      "explain": "querySelector() accepts any CSS selector and returns the first match."
+    },
+    {
+      "q": "Which event fires when a user clicks an element?",
+      "options": [
+        "submit",
+        "change",
+        "click",
+        "load"
+      ],
+      "answer": 2,
+      "explain": "The click event fires on mouse click or tap."
+    },
+    {
+      "q": "What does the async keyword do to a function?",
+      "options": [
+        "Runs it on a separate thread",
+        "Makes it return a Promise",
+        "Makes it synchronous",
+        "Delays it by one second"
+      ],
+      "answer": 1,
+      "explain": "Async functions always return a Promise and allow await inside."
+    },
+    {
+      "q": "Which keyword declares a constant in JavaScript?",
+      "options": [
+        "final",
+        "let",
+        "const",
+        "var"
+      ],
+      "answer": 2,
+      "explain": "const creates a binding that cannot be reassigned."
+    },
+    {
+      "q": "Which of these is a JavaScript data type?",
+      "options": [
+        "Double",
+        "Char",
+        "Float",
+        "Boolean"
+      ],
+      "answer": 3,
+      "explain": "JavaScript has Boolean, Number, String, Undefined, Null, Symbol, BigInt, and Object."
+    },
+    {
+      "q": "Which HTML5 element represents a block of navigation links?",
+      "options": [
+        "<nav>",
+        "<navigate>",
+        "<menu-bar>",
+        "<links>"
+      ],
+      "answer": 0,
+      "explain": "<nav> is a semantic element for major navigation."
+    },
+    {
+      "q": "Which tag creates an unordered (bulleted) list?",
+      "options": [
+        "<ul>",
+        "<li>",
+        "<list>",
+        "<ol>"
+      ],
+      "answer": 0,
+      "explain": "<ul> holds list items shown with bullets by default."
+    },
+    {
+      "q": "Which CSS unit is relative to the root element's font size?",
+      "options": [
+        "rem",
+        "em",
+        "px",
+        "pt"
+      ],
+      "answer": 0,
+      "explain": "rem scales with the font size of the html element."
+    },
+    {
+      "q": "Which CSS property controls the stacking order of positioned elements?",
+      "options": [
+        "z-index",
+        "order",
+        "stack",
+        "layer"
+      ],
+      "answer": 0,
+      "explain": "Higher z-index values appear in front of lower ones."
+    },
+    {
+      "q": "Which meta tag setting is essential for responsive layouts on mobile?",
+      "options": [
+        "name=\"keywords\"",
+        "name=\"author\"",
+        "charset=\"UTF-8\"",
+        "name=\"viewport\""
+      ],
+      "answer": 3,
+      "explain": "The viewport meta tag controls page width and scaling on mobile devices."
+    },
+    {
+      "q": "What is localStorage used for?",
+      "options": [
+        "Sending data to a server",
+        "Styling pages",
+        "Running a server-side database",
+        "Storing data in the browser that persists after it closes"
+      ],
+      "answer": 3,
+      "explain": "localStorage keeps key-value strings with no expiry until cleared."
+    },
+    {
+      "q": "Which of these is a CSS preprocessor?",
+      "options": [
+        "Node.js",
+        "Express",
+        "React",
+        "Sass"
+      ],
+      "answer": 3,
+      "explain": "Sass compiles to plain CSS and adds variables, nesting, and mixins."
+    },
+    {
+      "q": "What is the purpose of the HTML <head> element?",
+      "options": [
+        "Defines the page footer",
+        "Holds metadata such as the title and links to styles",
+        "Displays the main page content",
+        "Contains the navigation menu"
+      ],
+      "answer": 1,
+      "explain": "<head> contains information about the page that is not displayed directly."
+    },
+    {
+      "q": "Which JavaScript array method creates a new array by transforming each element?",
+      "options": [
+        "forEach()",
+        "splice()",
+        "map()",
+        "push()"
+      ],
+      "answer": 2,
+      "explain": "map() returns a new array of the callback results."
+    },
+    {
+      "q": "What does position: absolute do in CSS?",
+      "options": [
+        "Positions the element relative to its nearest positioned ancestor",
+        "Floats it to the left",
+        "Fixes it to the browser viewport",
+        "Keeps it in normal flow"
+      ],
+      "answer": 0,
+      "explain": "Absolute elements are removed from normal flow and placed using top/left/right/bottom."
+    },
+    {
+      "q": "Which protocol secures web traffic with encryption?",
+      "options": [
+        "FTP",
+        "HTTPS",
+        "HTTP",
+        "SMTP"
+      ],
+      "answer": 1,
+      "explain": "HTTPS is HTTP over TLS."
+    },
+    {
+      "q": "Which HTML5 attribute makes a form field mandatory?",
+      "options": [
+        "mandatory",
+        "validate",
+        "required",
+        "needed"
+      ],
+      "answer": 2,
+      "explain": "The required attribute blocks form submission when the field is empty."
+    },
+    {
+      "q": "What is an API in web development?",
+      "options": [
+        "A type of database",
+        "A set of rules that lets programs communicate with each other",
+        "A web browser",
+        "A CSS framework"
+      ],
+      "answer": 1,
+      "explain": "An Application Programming Interface defines how software components interact."
+    },
+    {
+      "q": "What does the defer attribute on a script tag do?",
+      "options": [
+        "Blocks parsing while the script loads",
+        "Downloads the script in parallel and runs it after the HTML is parsed",
+        "Prevents the script from ever running",
+        "Runs the script before any HTML loads"
+      ],
+      "answer": 1,
+      "explain": "Deferred scripts do not block HTML parsing and run in order afterwards."
+    }
+  ]
+}

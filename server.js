@@ -157,25 +157,44 @@ apiRouter.get('/exams/:slug', (req, res) => {
   }
 });
 
-// 8. Submit and grade exam
+// 8a. Start an exam attempt: the server picks 20 random questions for this attempt
+apiRouter.post('/exams/:slug/start', (req, res) => {
+  try {
+    const userId = req.user ? req.user.id : null;
+    const session = db.startExamSession(req.params.slug, userId);
+    if (!session) {
+      return res.status(404).json({ error: 'Exam not found.' });
+    }
+    res.json(session);
+  } catch (err) {
+    if (err.status) return res.status(err.status).json({ error: err.message });
+    console.error('Start error:', err);
+    res.status(500).json({ error: 'Failed to start exam.' });
+  }
+});
+
+// 8b. Submit and grade an exam attempt.
+// Body: { sessionId, answers: { [questionId]: selectedOptionIndex }, auto }
 apiRouter.post('/exams/:slug/submit', (req, res) => {
   try {
-    const { answers, auto } = req.body;
-    const userId = req.user ? req.user.id : null;
-    const userEmail = req.user ? req.user.email : (req.body.email || 'guest');
+    const { sessionId, answers, auto } = req.body || {};
+    if (!sessionId || typeof sessionId !== 'string') {
+      return res.status(400).json({ error: 'Missing exam session. Please start the exam again.' });
+    }
 
-    const result = db.gradeAndSaveAttempt({
+    const result = db.gradeSession({
+      sessionId,
       examSlug: req.params.slug,
-      answers: Array.isArray(answers) ? answers : [],
-      userId,
-      userEmail,
+      answers: answers && typeof answers === 'object' && !Array.isArray(answers) ? answers : {},
+      requesterId: req.user ? req.user.id : null,
       autoSubmitted: !!auto
     });
 
     res.json(result);
   } catch (err) {
+    if (err.status) return res.status(err.status).json({ error: err.message });
     console.error('Submit error:', err);
-    res.status(500).json({ error: 'Failed to submit exam: ' + err.message });
+    res.status(500).json({ error: 'Failed to submit exam.' });
   }
 });
 

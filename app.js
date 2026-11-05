@@ -75,6 +75,9 @@
   let answers = [];
   let timerId = null;
   let secondsLeft = 0;
+  let currentSessionId = null;
+  let deadline = 0;
+  let submitting = false;
   let toastTimer = null;
   let lastResult = null;
 
@@ -376,28 +379,64 @@
     $("#themeToggle").textContent = document.body.classList.contains("dark") ? "☾" : "☼";
   });
 
+  const QUIZ_SIZE = 20;
+
+  function shuffle(list) {
+    const a = list.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  // Timer is based on a fixed deadline, so a sleeping laptop or a throttled tab cannot add time
+  function startTimer() {
+    clearInterval(timerId);
+    deadline = Date.now() + secondsLeft * 1000;
+    timerId = setInterval(() => {
+      secondsLeft = Math.max(0, Math.ceil((deadline - Date.now()) / 1000));
+      updateTimer();
+      if (secondsLeft <= 0) {
+        clearInterval(timerId);
+        finishExam(true);
+      }
+    }, 1000);
+  }
+
   async function startExam(key) {
     currentExamKey = key;
     currentIndex = 0;
+    currentSessionId = null;
+    currentExam = null;
 
     if (isBackendOnline) {
+      // The server picks a fresh set of random questions for every attempt
       try {
-        const res = await fetch(`${API_BASE}/api/exams/${key}`);
-        if (res.ok) {
-          currentExam = await res.json();
-        } else {
-          currentExam = localExamData[key];
+        const res = await fetch(`${API_BASE}/api/exams/${key}/start`, {
+          method: "POST",
+          headers: authHeaders()
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          toast(data.error || "Exam could not be started.");
+          return;
         }
+        currentExam = data;
+        currentSessionId = data.sessionId;
       } catch {
-        currentExam = localExamData[key];
+        toast("Server not reachable. Using the offline practice set.");
       }
-    } else {
-      currentExam = localExamData[key];
     }
 
     if (!currentExam) {
-      toast("Error: Exam could not be loaded.");
-      return;
+      // Offline: shuffle whatever questions are bundled with the page
+      const base = localExamData[key];
+      if (!base) {
+        toast("Error: Exam could not be loaded.");
+        return;
+      }
+      currentExam = { ...base, questions: shuffle(base.questions).slice(0, QUIZ_SIZE) };
     }
 
     answers = Array(currentExam.questions.length).fill(null);
@@ -407,16 +446,7 @@
     renderQuestion();
     openDialog("examDialog");
     updateTimer();
-
-    clearInterval(timerId);
-    timerId = setInterval(() => {
-      secondsLeft--;
-      updateTimer();
-      if (secondsLeft <= 0) {
-        clearInterval(timerId);
-        finishExam(true);
-      }
-    }, 1000);
+    startTimer();
   }
 
   $$(".start-exam").forEach(b => b.addEventListener("click", () => startExam(b.dataset.exam)));
@@ -506,41 +536,64 @@
   });
 
   async function finishExam(auto = false) {
+    if (submitting) return;
     clearInterval(timerId);
-    closeDialog("examDialog");
 
     let resultData = null;
 
-    if (isBackendOnline) {
+    if (currentSessionId) {
+      // Online attempt: the server knows the questions and the correct answers, so it grades
+      submitting = true;
       try {
+        const byId = {};
+        currentExam.questions.forEach((q, i) => {
+          if (answers[i] !== null) byId[q.id] = answers[i];
+        });
         const res = await fetch(`${API_BASE}/api/exams/${currentExamKey}/submit`, {
           method: "POST",
           headers: authHeaders(),
-          body: JSON.stringify({
-            answers,
-            auto,
-            email: user ? user.email : "guest"
-          })
+          body: JSON.stringify({ sessionId: currentSessionId, answers: byId, auto })
         });
+        const data = await res.json().catch(() => ({}));
         if (res.ok) {
-          resultData = await res.json();
+          resultData = data;
           lastResult = resultData;
+          currentSessionId = null;
           toast("Attempt saved to SQLite database!");
+        } else if ([400, 403, 404, 409, 410].includes(res.status)) {
+          // The attempt is not valid any more (expired, already submitted, ...)
+          currentSessionId = null;
+          closeDialog("examDialog");
+          toast(data.error || "This attempt could not be submitted.");
+          return;
+        } else {
+          throw new Error(data.error || "Server error");
         }
       } catch (err) {
-        console.warn("Backend submit failed, calculating locally:", err);
+        // Network/server problem: keep the exam open so the student can press Submit again
+        console.warn("Submit failed:", err);
+        toast("Could not submit. Check your connection and press Submit again.");
+        currentIndex = currentExam.questions.length - 1;
+        renderQuestion();
+        if (secondsLeft > 0) startTimer();
+        return;
+      } finally {
+        submitting = false;
       }
     }
 
-    // Local grading fallback if backend was unavailable
+    closeDialog("examDialog");
+
+    // Local grading (offline practice set only)
     if (!resultData) {
       const qs = currentExam.questions;
       let correct = 0;
       qs.forEach((q, i) => {
         if (answers[i] === q.answer) correct++;
       });
-      const points = correct * 2;
-      const total = qs.length * 2;
+      const perQuestion = currentExam.pointsPerQuestion || 2;
+      const points = correct * perQuestion;
+      const total = qs.length * perQuestion;
       const percent = Math.round((correct / qs.length) * 100);
 
       const review = qs.map((q, i) => ({
@@ -699,6 +752,40 @@
     if (el) el.classList.add("done");
   }
 
+  // Show the real question count / time / points on each exam card
+  async function refreshExamCards() {
+    let info = {};
+    if (isBackendOnline) {
+      try {
+        const res = await fetch(`${API_BASE}/api/exams`);
+        if (res.ok) {
+          for (const e of await res.json()) {
+            info[e.slug] = { minutes: Math.round(e.timeLimit / 60), count: e.quizSize, points: e.quizPoints };
+          }
+        }
+      } catch {
+        // keep static text
+      }
+    }
+    if (!Object.keys(info).length) {
+      for (const [slug, e] of Object.entries(localExamData)) {
+        const count = Math.min(QUIZ_SIZE, e.questions.length);
+        info[slug] = {
+          minutes: Math.round((e.time || e.timeLimit || 480) / 60),
+          count,
+          points: count * (e.pointsPerQuestion || 2)
+        };
+      }
+    }
+    $$(".start-exam").forEach(btn => {
+      const i = info[btn.dataset.exam];
+      const box = btn.parentElement && btn.parentElement.querySelector(".exam-details");
+      if (i && box) {
+        box.innerHTML = `<span>◷ ${i.minutes} min</span><span>▤ ${i.count} questions</span><span>★ ${i.points} points</span>`;
+      }
+    });
+  }
+
   // Initialization lifecycle
   async function init() {
     setTimeout(hideLoader, 500);
@@ -707,6 +794,7 @@
       await checkBackendStatus();
       await syncSession();
       await syncAttempts();
+      await refreshExamCards();
     } catch (e) {
       console.warn("Backend sync error:", e);
     } finally {

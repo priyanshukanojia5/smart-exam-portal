@@ -46,6 +46,8 @@ The application uses an embedded **SQLite 3 database (`exam_portal.db`)** that r
    - `id`, `user_id` (FK -> users), `user_email`, `exam_id`, `exam_slug`, `exam_title`, `points`, `total_points`, `percent`, `correct_count`, `incorrect_count`, `auto_submitted`, `created_at`
 7. **`attempt_answers`**
    - `id`, `attempt_id` (FK -> attempts), `question_id` (FK -> questions), `selected_option`, `is_correct`
+8. **`exam_sessions`**
+   - `id` (UUID), `user_id` (FK -> users, nullable for guests), `exam_id` (FK -> exams), `question_ids` (JSON list of the questions picked for this attempt), `started_at`, `expires_at`, `submitted`
 
 ---
 
@@ -81,8 +83,9 @@ Output preview:
 | `GET` | `/api/auth/me` | Verify and return active user session |
 | `POST` | `/api/auth/logout` | Invalidate active session in database |
 | `GET` | `/api/exams` | List all exams from database |
-| `GET` | `/api/exams/:slug` | Get exam details and questions |
-| `POST` | `/api/exams/:slug/submit` | Server-side exam grading & save attempt to DB |
+| `GET` | `/api/exams/:slug` | Get exam details and the full question bank (no answers) |
+| `POST` | `/api/exams/:slug/start` | Start an attempt: returns a `sessionId` and **20 random questions** (no answers) |
+| `POST` | `/api/exams/:slug/submit` | Grade an attempt. Body: `{ sessionId, answers: { "<questionId>": optionIndex }, auto }` |
 | `GET` | `/api/attempts` | Fetch user attempt history from database |
 | `DELETE` | `/api/attempts` | Clear user attempt history from database |
 | `GET` | `/api/stats` | Dashboard statistics (exams, attempts, best score) |
@@ -94,6 +97,8 @@ Output preview:
 - **Real Database Persistence:** All users, sessions, questions, and attempt records are saved in SQLite (`exam_portal.db`).
 - **Live Database Badge:** Header displays `🟢 SQLite Connected` in real-time.
 - **Secure Authentication:** Passwords hashed with `bcryptjs` (salt rounds: 10).
+- **Random 20 Questions Per Attempt:** Each exam has a bank of 40 questions (`questions-bank.json`, synced into the database on every start). Every attempt gets 20 randomly chosen ones, picked and remembered by the server (`exam_sessions`). Retaking an exam gives a different mix. Add more questions to `questions-bank.json` and restart to grow the bank; existing databases are upgraded automatically.
+- **Server-Checked Timer:** Each attempt has a deadline stored on the server (20 minutes). Submissions more than 60 seconds late are rejected, and an attempt can only be submitted once.
 - **Anti-Cheat Grading:** Correct answers and explanations are protected on the server and only revealed upon submission.
 - **Detailed Review:** Score ring, correct/incorrect count, and explanations for each question.
 - **Offline Resilience:** If the server is stopped, the frontend smoothly falls back to local mode with a `🟡 Offline Mode` badge.
